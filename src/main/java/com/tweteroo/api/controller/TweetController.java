@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tweteroo.api.DTO.TextDTO;
 import com.tweteroo.api.DTO.TweetDTO;
+import com.tweteroo.api.model.TweetModel;
 import com.tweteroo.api.service.TweetService;
 
 import jakarta.validation.Valid;
@@ -31,21 +33,27 @@ public class TweetController {
   private TweetService service;
 
   @GetMapping("/api/tweets")
-  public Stream<Object> listTweetPage(@RequestParam String page) {
+  public ResponseEntity listTweetPage(@RequestParam String page) {
     int pageNumber = Integer.parseInt(page);
     Pageable byIdDesc = PageRequest.of(pageNumber, 5, Sort.by("id").descending());
-    return service.listTweetPage(byIdDesc);
+    return ResponseEntity.status(200).body(service.listTweetPage(byIdDesc));
   }
 
   @GetMapping("/api/tweets/{username}")
-  public Stream<Object> listAllUserTweets(@PathVariable String username) {
-    return service.listAllUserTweets(username);
+  public ResponseEntity listAllUserTweets(@PathVariable String username) {
+    return ResponseEntity.status(200).body(service.listAllUserTweets(username));
   }
 
   @PostMapping("/api/tweets")
-  public void postTweet(@RequestBody @Valid TextDTO text, @RequestHeader("User") String username) {
+  public ResponseEntity postTweet(@RequestBody @Valid TextDTO text, @RequestHeader("User") String username) {
     TweetDTO tweet = new TweetDTO(username, text.text());
-    service.postTweet(tweet);
+    TweetModel created = service.postTweet(tweet);
+
+    if(created == null){
+      return ResponseEntity.status(409).build();
+    }
+
+    return ResponseEntity.status(201).build();
   }
 
 }

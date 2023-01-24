@@ -46,6 +46,10 @@ public class TweetService {
   }
 
   public TweetModel postTweet(TweetDTO tweet) {
+    UserModel user = userRepository.findByUsername(tweet.username());
+    if(user == null){
+      return null;
+    }
     return tweetRepository.save(new TweetModel(tweet));
   }
 }
