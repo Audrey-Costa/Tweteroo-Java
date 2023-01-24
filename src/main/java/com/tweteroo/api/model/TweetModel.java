@@ -14,10 +14,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 public class TweetModel {
-  public TweetModel(TweetDTO data){
-    this.username = data.username();
-    this.avatar = data.avatar();
-    this.text = data.text();
+  public TweetModel(TweetDTO tweet){
+    this.username = tweet.username();
+    this.text = tweet.text();
   }
 
   @Id
@@ -26,9 +25,6 @@ public class TweetModel {
 
   @Column
   private String username;
-
-  @Column
-  private String avatar;
 
   @Column
   private String text;
